@@ -7,7 +7,7 @@
     <ProjectGuid>e52be26a-1706-4eeb-b53b-9ae33e49173a</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
-    <DockerServiceName>tms.tasks.service</DockerServiceName>
+    <DockerServiceName>tms.notes.service</DockerServiceName>
 
 	 <DockerComposeProjectName>notes</DockerComposeProjectName>
   </PropertyGroup>

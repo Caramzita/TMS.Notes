@@ -14,11 +14,11 @@ services:
       - "5432:5432"
     restart: always
 
-  tms.tasks.service:
-    image: ${DOCKER_REGISTRY-}tmstasksservice
+  tms.notes.service:
+    image: tms_notes_service
     build:
       context: .
-      dockerfile: src/TMS.Tasks.Service/Dockerfile
+      dockerfile: src/TMS.Notes.Service/Dockerfile
     depends_on:
       - postgres
     environment:
