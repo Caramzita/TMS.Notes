@@ -15,6 +15,6 @@ public class GetNotesQueryHandler : IStreamRequestHandler<GetNotesQuery, Note>
 
     public IAsyncEnumerable<Note> Handle(GetNotesQuery query, CancellationToken cancellationToken)
     {
-        return _taskRepository.GetNotes();
+        return _taskRepository.GetNotes(query.UserId);
     }
 }

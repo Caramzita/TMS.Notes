@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using TMS.Notes.Core;
 
 namespace TMS.Notes.UseCases.Notes;
 
@@ -8,15 +9,15 @@ public class NoteModelValidator : AbstractValidator<NoteInputModel>
     {
         RuleFor(model => model.Title)
             .NotEmpty()
-            .MaximumLength(50)
-            .WithMessage("Заголовок не должен содержать больше 50 символов");
+            .MaximumLength(Note.MAX_LENGHT_TITLE)
+            .WithMessage($"Заголовок не должен содержать больше {Note.MAX_LENGHT_TITLE} символов");
 
         RuleFor(model => model.Description)
-            .MaximumLength(250)
-            .WithMessage("Содержание не должно содержать больше 250 символов");
+            .MaximumLength(Note.MAX_LENGHT_DESCRIPTION)
+            .WithMessage($"Содержание не должно содержать больше {Note.MAX_LENGHT_DESCRIPTION} символов");
 
         RuleFor(model => model.UserId)
-            .NotNull()
+            .NotEqual(Guid.Empty)
             .WithMessage("Идентификатор пользователя не должен быть пустым");
     }
 }

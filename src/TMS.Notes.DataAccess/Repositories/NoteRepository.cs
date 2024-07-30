@@ -11,9 +11,11 @@ public class NoteRepository : INoteRepository
     public NoteRepository(NoteDbContext сontext) => 
         _context = сontext;
 
-    public IAsyncEnumerable<Note> GetNotes()
+    public IAsyncEnumerable<Note> GetNotes(Guid userId)
     {
-        return _context.Notes.AsNoTracking()
+        return _context.Notes.Where(note => note.UserId == userId)
+                             .AsNoTracking()
+                             .AsNoTracking()
                              .AsAsyncEnumerable();
     }
 

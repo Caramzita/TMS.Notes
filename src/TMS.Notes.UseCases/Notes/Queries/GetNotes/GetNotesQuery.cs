@@ -3,4 +3,12 @@ using TMS.Notes.Core;
 
 namespace TMS.Notes.UseCases.Notes.Queries.GetNotes;
 
-public sealed record GetNotesQuery : IStreamRequest<Note>;
+public sealed class GetNotesQuery : IStreamRequest<Note>
+{
+    public Guid UserId { get; }
+
+    public GetNotesQuery(Guid userId)
+    {
+        UserId = userId;
+    }
+}

@@ -29,10 +29,9 @@ public class NoteController : ControllerBase
     [ProducesResponseType(typeof(IAsyncEnumerable<Note>), 200)]
     public IAsyncEnumerable<Note> GetAllNotes()
     {
-        return _mediator.CreateStream(new GetNotesQuery());
+        var userId = Guid.Parse("07ab923c-3253-4dc1-85ab-31e4543b9ea9");
+        return _mediator.CreateStream(new GetNotesQuery(userId));
     }
-
-    [HttpGet("{id:guid}")]
 
     [HttpPost]
     [ProducesResponseType(typeof(Note), 201)]
@@ -47,7 +46,7 @@ public class NoteController : ControllerBase
         return Created();
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut]
     [ProducesResponseType(typeof(Note), 200)]
     public async Task<IActionResult> Update([FromBody] UpdateNoteDto request)
     {
@@ -55,7 +54,7 @@ public class NoteController : ControllerBase
         var command = _mapper.Map<NoteInputModel>(request);
         command.UserId = userId;
 
-        var result = await _mediator.Send(new UpdateNoteCommand(request.id, command));
+        var result = await _mediator.Send(new UpdateNoteCommand(request.Id, command));
 
         return Ok(result);
     }

@@ -8,7 +8,11 @@ public class UpdateNoteCommandValidator : AbstractValidator<UpdateNoteCommand>
     {
         RuleFor(command => command.Model)
             .NotNull()
-            .WithMessage("Данные для ввода обязательны")
+            .WithMessage("Данные ввода не могут быть пустыми")
             .SetValidator(command => new NoteModelValidator());
+
+        RuleFor(command => command.Id)
+            .NotEqual(Guid.Empty)
+            .WithMessage("Идентификатор заметки не должен быть пустым");
     }
 }

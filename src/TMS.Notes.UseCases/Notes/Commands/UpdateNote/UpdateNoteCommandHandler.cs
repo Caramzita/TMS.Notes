@@ -2,6 +2,7 @@
 using MediatR;
 using TMS.Notes.Core;
 using TMS.Notes.UseCases.Abstractions;
+using TMS.Notes.UseCases.Exceptions;
 
 namespace TMS.Notes.UseCases.Notes.Commands.UpdateNote;
 
@@ -23,7 +24,7 @@ public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Note>
 
         if (entity == null || entity.UserId != request.Model.UserId)
         {
-            throw new ArgumentException("Такой заметки не существует");
+            throw new NotFoundException(nameof(Note), request.Id);
         }
 
         entity.Title = request.Model.Title;

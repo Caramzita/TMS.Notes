@@ -1,61 +1,85 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NLog;
+using NLog.Web;
 using TMS.Notes.DataAccess;
 using TMS.Notes.DataAccess.Repositories;
+using TMS.Notes.Service.MiddleWare;
 using TMS.Notes.UseCases;
 using TMS.Notes.UseCases.Abstractions;
 using TMS.Notes.UseCases.Notes.Commands.CreateNote;
 
-var builder = WebApplication.CreateBuilder(args);
+var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Debug("init main");
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<NoteDbContext>(
-    options =>
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
+
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+    builder.Services.AddDbContext<NoteDbContext>(
+        options =>
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DatabaseConnection"))
+            .EnableSensitiveDataLogging()
+            .LogTo(Console.WriteLine);
+        });
+
+    builder.Services.AddScoped<INoteRepository, NoteRepository>();
+    builder.Services.AddAutoMapper(cfg => cfg.AddProfile(typeof(MappingProfile)));
+    builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateNoteCommand).Assembly));
+
+    builder.Services.AddValidatorsFromAssemblyContaining<CreateNoteCommandValidator>();
+    builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+
+    builder.Services.AddCors(options =>
     {
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DatabaseConnection"));
+        options.AddDefaultPolicy(policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
     });
 
-builder.Services.AddScoped<INoteRepository, NoteRepository>();
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile(typeof(MappingProfile)));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateNoteCommand).Assembly));
+    builder.Services.AddHealthChecks();
 
-builder.Services.AddValidatorsFromAssemblyContaining<CreateNoteCommandValidator>();
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+    var app = builder.Build();
 
-
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
+    if (app.Environment.IsDevelopment())
     {
-        policy.WithOrigins("http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+        app.UseDeveloperExceptionPage();
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+    app.UseMiddleware<ErrorExceptionHandler>();
 
-builder.Services.AddHealthChecks();
+    app.UseRouting();
 
-var app = builder.Build();
+    app.UseCors();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+
 }
-
-app.UseRouting();
-
-app.UseCors();
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    logger.Error(ex, "Stopped program because of exception");
+    throw;
+}
+finally
+{
+    LogManager.Shutdown();
+}

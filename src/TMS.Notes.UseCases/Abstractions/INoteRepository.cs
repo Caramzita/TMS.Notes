@@ -10,7 +10,7 @@ public interface INoteRepository
 
     Task<Note?> GetNoteById(Guid id);
 
-    IAsyncEnumerable<Note> GetNotes();
+    IAsyncEnumerable<Note> GetNotes(Guid userId);
 
     Task Update(Note note);
 }

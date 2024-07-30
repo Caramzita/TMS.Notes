@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
+using TMS.Notes.Core;
 using TMS.Notes.UseCases.Abstractions;
+using TMS.Notes.UseCases.Exceptions;
 
 namespace TMS.Notes.UseCases.Notes.Commands.DeleteNote;
 
@@ -20,10 +22,12 @@ public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, Unit>
     {
         var entity = await _taskRepository.GetNoteById(request.Id);
 
-        if (entity != null && entity.UserId == request.UserId)
+        if (entity == null || entity.UserId != request.UserId)
         {
-            await _taskRepository.Delete(entity).ConfigureAwait(false);
+            throw new NotFoundException(nameof(Note), request.Id);
         }
+
+        await _taskRepository.Delete(entity).ConfigureAwait(false);
 
         return Unit.Value;
     }
