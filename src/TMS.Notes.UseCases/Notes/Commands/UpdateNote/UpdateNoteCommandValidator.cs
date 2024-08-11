@@ -2,6 +2,9 @@
 
 namespace TMS.Notes.UseCases.Notes.Commands.UpdateNote;
 
+/// <summary>
+/// Валидатор команды обновления заметки.
+/// </summary>
 public class UpdateNoteCommandValidator : AbstractValidator<UpdateNoteCommand>
 {
     public UpdateNoteCommandValidator()

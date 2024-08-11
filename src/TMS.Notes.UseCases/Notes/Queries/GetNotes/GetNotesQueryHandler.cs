@@ -4,6 +4,9 @@ using TMS.Notes.UseCases.Abstractions;
 
 namespace TMS.Notes.UseCases.Notes.Queries.GetNotes;
 
+/// <summary>
+/// Обработчик запроса получения всех заметок пользователя.
+/// </summary>
 public class GetNotesQueryHandler : IStreamRequestHandler<GetNotesQuery, Note>
 {
     private readonly INoteRepository _taskRepository;

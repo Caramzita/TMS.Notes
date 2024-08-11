@@ -5,19 +5,22 @@ using TMS.Notes.UseCases.Abstractions;
 
 namespace TMS.Notes.UseCases.Notes.Commands.CreateNote;
 
-public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Note>
+/// <summary>
+/// Обработчик добавления заметки.
+/// </summary>
+public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Guid>
 {
-    private readonly INoteRepository _taskRepository;
+    private readonly INoteRepository _noteRepository;
 
     private readonly IMapper _mapper;
 
-    public CreateNoteCommandHandler(INoteRepository taskRepository, IMapper mapper)
+    public CreateNoteCommandHandler(INoteRepository noteRepository, IMapper mapper)
     {
-        _taskRepository = taskRepository ?? throw new ArgumentNullException(nameof(taskRepository));
+        _noteRepository = noteRepository ?? throw new ArgumentNullException(nameof(noteRepository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
-    public async Task<Note> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
     {
         var note = new Note()
         {
@@ -29,8 +32,8 @@ public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Note>
             EditDate = DateTime.UtcNow,
         };
 
-        await _taskRepository.Add(note).ConfigureAwait(false);
+        await _noteRepository.Add(note).ConfigureAwait(false);
 
-        return note;
+        return note.Id;
     }
 }

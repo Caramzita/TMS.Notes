@@ -1,10 +1,15 @@
 ﻿using MediatR;
-using TMS.Notes.Core;
 
 namespace TMS.Notes.UseCases.Notes.Commands.CreateNote;
 
-public class CreateNoteCommand : IRequest<Note>
+/// <summary>
+/// Команда добавления заметки.
+/// </summary>
+public class CreateNoteCommand : IRequest<Guid>
 {
+    /// <summary>
+    /// Модель заметки.
+    /// </summary>
     public NoteInputModel Model { get; }
 
     public CreateNoteCommand(NoteInputModel model)

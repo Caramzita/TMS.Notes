@@ -2,6 +2,9 @@
 
 namespace TMS.Notes.UseCases.Notes.Commands.CreateNote;
 
+/// <summary>
+/// Валидатор команды добавления заметки.
+/// </summary>
 public class CreateNoteCommandValidator : AbstractValidator<CreateNoteCommand>
 {
     public CreateNoteCommandValidator()

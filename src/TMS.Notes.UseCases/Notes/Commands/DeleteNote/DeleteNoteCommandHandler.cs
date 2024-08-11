@@ -6,6 +6,9 @@ using TMS.Notes.UseCases.Exceptions;
 
 namespace TMS.Notes.UseCases.Notes.Commands.DeleteNote;
 
+/// <summary>
+/// Обработчик команды удаления заметки.
+/// </summary>
 public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, Unit>
 {
     private readonly INoteRepository _taskRepository;

@@ -1,8 +1,17 @@
 ﻿namespace TMS.Notes.UseCases.Dtos;
 
+/// <summary>
+/// Dto добавление заметки.
+/// </summary>
 public class CreateNoteDto
 {
-    public string Title { get; set; }
+    /// <summary>
+    /// Заголовок.
+    /// </summary>
+    public string Title { get; set; } = string.Empty;
 
-    public string Description { get; set; }
+    /// <summary>
+    /// Описание.
+    /// </summary>
+    public string Description { get; set; } = string.Empty;
 }

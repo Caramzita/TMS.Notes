@@ -6,6 +6,9 @@ using TMS.Notes.UseCases.Exceptions;
 
 namespace TMS.Notes.UseCases.Notes.Commands.UpdateNote;
 
+/// <summary>
+/// Обработчик команды обновления заметки.
+/// </summary>
 public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Note>
 {
     private readonly INoteRepository _taskRepository;

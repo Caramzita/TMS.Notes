@@ -4,12 +4,14 @@ using TMS.Notes.Core;
 
 namespace TMS.Notes.DataAccess.Configurations;
 
+/// <summary>
+/// Конфигурация класса заметок.
+/// </summary>
 public class NoteConfiguration : IEntityTypeConfiguration<Note>
 {
     public void Configure(EntityTypeBuilder<Note> builder)
     {
         builder.HasKey(note => note.Id);
-        builder.HasIndex(note => note.Id).IsUnique();
         builder.Property(note => note.Title).HasMaxLength(Note.MAX_LENGHT_TITLE);
         builder.Property(note => note.Description).HasMaxLength(Note.MAX_LENGHT_DESCRIPTION);
 

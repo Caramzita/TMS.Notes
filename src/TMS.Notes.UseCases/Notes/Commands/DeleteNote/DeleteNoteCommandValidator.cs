@@ -3,6 +3,9 @@ using FluentValidation;
 
 namespace TMS.Notes.UseCases.Notes.Commands.DeleteNote;
 
+/// <summary>
+/// Валидатор команды удаления заметки.
+/// </summary>
 public class DeleteNoteCommandValidator : AbstractValidator<DeleteNoteCommand>
 {
     public DeleteNoteCommandValidator()

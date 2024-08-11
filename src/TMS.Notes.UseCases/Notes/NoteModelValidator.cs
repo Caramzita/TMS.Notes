@@ -3,6 +3,9 @@ using TMS.Notes.Core;
 
 namespace TMS.Notes.UseCases.Notes;
 
+/// <summary>
+/// Валидатор модели заметки.
+/// </summary>
 public class NoteModelValidator : AbstractValidator<NoteInputModel>
 {
     public NoteModelValidator()
