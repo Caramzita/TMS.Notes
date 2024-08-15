@@ -2,8 +2,10 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using System.Reflection;
 using System.Text;
 using TMS.Notes.DataAccess;
 using TMS.Notes.DataAccess.Repositories;
@@ -16,6 +18,9 @@ using TMS.Notes.UseCases.Notes.Commands.CreateNote;
 
 namespace TMS.Notes.Service;
 
+/// <summary>
+/// Ёкземпл€р класса <see cref="Program"/>.
+/// </summary>
 public class Program
 {
     private static async Task Main(string[] args)
@@ -48,28 +53,69 @@ public class Program
 
         builder.Logging.ClearProviders();
         builder.Host.UseSerilog();
+        //builder.Configuration
+        //    .SetBasePath(Directory.GetCurrentDirectory())
+        //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
         var services = builder.Services;
 
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlFilePath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+        services.AddSwaggerGen(opts =>
+        {
+            opts.IncludeXmlComments(xmlFilePath);
+
+            opts.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+            {
+                Description = @"Enter access token",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                BearerFormat = "JWT",
+                Scheme = JwtBearerDefaults.AuthenticationScheme
+            });
+
+            opts.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = JwtBearerDefaults.AuthenticationScheme,
+                            Type = ReferenceType.SecurityScheme,
+                        },
+                    },
+                    new List<string>()
+                }
+            });
+        });
 
         services.AddHttpContextAccessor();
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey
-                            (Encoding.UTF8.GetBytes("7C791D0AD2D1A61736718914DB3D408BBAE06C9F988243CBEB903EB6DA0E1DD7"))
-                    };
-                });
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(opts =>
+        {
+            opts.TokenValidationParameters = new TokenValidationParameters
+            {
+                //ValidAudience = builder.Configuration["JwtSecurityToken:Audience"],
+                //ValidIssuer = builder.Configuration["JwtSecurityToken:Issuer"],
+                IssuerSigningKey = new SymmetricSecurityKey
+                    (Encoding.UTF8.GetBytes(builder.Configuration["K17T6p+mYlBuIll6EOQDUmAdM6xmzeHOpE+O35zsAvw="]!)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+            };
+        });
 
 
         services.AddCors(options =>
