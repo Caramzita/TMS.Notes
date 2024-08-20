@@ -9,15 +9,15 @@ namespace TMS.Notes.UseCases.Notes.Queries.GetNotes;
 /// </summary>
 public class GetNotesQueryHandler : IStreamRequestHandler<GetNotesQuery, Note>
 {
-    private readonly INoteRepository _taskRepository;
+    private readonly INoteRepository _noteRepository;
 
-    public GetNotesQueryHandler(INoteRepository taskRepository)
+    public GetNotesQueryHandler(INoteRepository noteRepository)
     {
-        _taskRepository = taskRepository ?? throw new ArgumentNullException(nameof(taskRepository));
+        _noteRepository = noteRepository ?? throw new ArgumentNullException(nameof(noteRepository));
     }
 
     public IAsyncEnumerable<Note> Handle(GetNotesQuery query, CancellationToken cancellationToken)
     {
-        return _taskRepository.GetNotes(query.UserId);
+        return _noteRepository.GetNotesAsync(query.UserId, query.SearchTerm, query.SortBy);
     }
 }

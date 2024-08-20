@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using TMS.Application.UseCases;
 using TMS.Notes.Core;
 
 namespace TMS.Notes.UseCases.Notes.Commands.UpdateNote;
@@ -6,7 +7,7 @@ namespace TMS.Notes.UseCases.Notes.Commands.UpdateNote;
 /// <summary>
 /// Команда обновления заметки.
 /// </summary>
-public class UpdateNoteCommand : IRequest<Note>
+public class UpdateNoteCommand : IRequest<Result<Note>>
 {
     /// <summary>
     /// Идентификатор заметки.

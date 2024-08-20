@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using TMS.Application.UseCases;
 using TMS.Notes.Core;
 using TMS.Notes.UseCases.Abstractions;
 
@@ -8,32 +9,21 @@ namespace TMS.Notes.UseCases.Notes.Commands.CreateNote;
 /// <summary>
 /// Обработчик добавления заметки.
 /// </summary>
-public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Guid>
+public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Result<Guid>>
 {
     private readonly INoteRepository _noteRepository;
 
-    private readonly IMapper _mapper;
-
-    public CreateNoteCommandHandler(INoteRepository noteRepository, IMapper mapper)
+    public CreateNoteCommandHandler(INoteRepository noteRepository)
     {
         _noteRepository = noteRepository ?? throw new ArgumentNullException(nameof(noteRepository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
-    public async Task<Guid> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
     {
-        var note = new Note()
-        {
-            Id = Guid.NewGuid(),
-            UserId = request.Model.UserId,
-            Title = request.Model.Title,
-            Description = request.Model.Description,
-            CreationDate = DateTime.UtcNow,
-            EditDate = DateTime.UtcNow,
-        };
+        var note = new Note(request.Model.Title, request.Model.Description, request.Model.UserId);
 
         await _noteRepository.Add(note).ConfigureAwait(false);
 
-        return note.Id;
+        return Result<Guid>.SuccessfullyCreated(note.Id);
     }
 }

@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using TMS.Notes.Core;
+using TMS.Notes.DataAccess.Dtos;
 using TMS.Notes.UseCases.Abstractions;
 
 namespace TMS.Notes.DataAccess.Repositories;
@@ -14,19 +17,42 @@ public class NoteRepository : INoteRepository
     /// </summary>
     private readonly NoteDbContext _context;
 
-    public NoteRepository(NoteDbContext context) => 
+    private readonly IMapper _mapper;
+
+    public NoteRepository(NoteDbContext context, IMapper mapper)
+    {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+    }
 
     /// <summary>
     /// Получить все заметки пользователя.
     /// </summary>
     /// <param name="userId">Идентификатор пользователя.</param>
     /// <returns>Асинхронный список заметок.</returns>
-    public IAsyncEnumerable<Note> GetNotes(Guid userId)
+    public async IAsyncEnumerable<Note> GetNotesAsync(Guid userId, string? searchTerm = null, string? sortBy = null)
     {
-        return _context.Notes.AsNoTracking()
-                             .Where(note => note.UserId == userId)
-                             .AsAsyncEnumerable();
+        var query = _context.Notes.AsNoTracking().Where(note => note.UserId == userId);
+
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            query = query.Where(note => note.Title.Contains(searchTerm));
+        }
+
+        query = sortBy switch
+        {
+            "title" => query.OrderBy(note => note.Title),
+            "creationDate" => query.OrderBy(note => note.CreationDate),
+            "editDate" => query.OrderBy(note => note.EditDate),
+            _ => query.OrderBy(note => note.CreationDate)
+        };
+
+        var entities = query.AsAsyncEnumerable();
+
+        await foreach (var entity in entities)
+        {
+            yield return _mapper.Map<Note>(entity);
+        }
     }
 
     /// <summary>
@@ -36,9 +62,11 @@ public class NoteRepository : INoteRepository
     /// <returns>Запрашиваемая заметка.</returns>
     public async Task<Note?> GetNoteById(Guid id)
     {
-        return await _context.Notes.AsNoTracking()
+        var entity = await _context.Notes.AsNoTracking()
                                    .FirstOrDefaultAsync(n => n.Id == id)
                                    .ConfigureAwait(false);
+
+        return _mapper.Map<Note>(entity);
     }
 
     /// <summary>
@@ -47,7 +75,9 @@ public class NoteRepository : INoteRepository
     /// <param name="note">Заметка.</param>
     public async Task Add(Note note)
     {
-        await _context.AddAsync(note).ConfigureAwait(false);
+        var entity = _mapper.Map<NoteDto>(note);
+
+        await _context.AddAsync(entity).ConfigureAwait(false);
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 
@@ -57,7 +87,9 @@ public class NoteRepository : INoteRepository
     /// <param name="note">Заметка.</param>
     public async Task Delete(Note note)
     {
-        _context.Notes.Remove(note);
+        var entity = _mapper.Map<NoteDto>(note);
+
+        _context.Notes.Remove(entity);
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 
@@ -67,7 +99,9 @@ public class NoteRepository : INoteRepository
     /// <param name="note">Заметка.</param>
     public async Task Update(Note note)
     {
-        _context.Notes.Update(note);
+        var entity = _mapper.Map<NoteDto>(note);
+
+        _context.Notes.Update(entity);
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

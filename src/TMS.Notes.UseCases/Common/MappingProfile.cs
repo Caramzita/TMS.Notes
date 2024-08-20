@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using TMS.Notes.UseCases.Dtos;
+using TMS.Notes.Contracts;
 using TMS.Notes.UseCases.Notes;
 
 namespace TMS.Notes.UseCases.Common;
@@ -11,8 +11,8 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<CreateNoteDto, NoteInputModel>();
+        CreateMap<CreateNoteRequest, NoteInputModel>();
 
-        CreateMap<UpdateNoteDto, NoteInputModel>();
+        CreateMap<UpdateNoteRequest, NoteInputModel>();
     }
 }

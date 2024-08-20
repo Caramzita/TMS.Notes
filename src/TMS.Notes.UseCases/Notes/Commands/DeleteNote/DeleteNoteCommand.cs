@@ -1,11 +1,12 @@
 ﻿using MediatR;
+using TMS.Application.UseCases;
 
 namespace TMS.Notes.UseCases.Notes.Commands.DeleteNote;
 
 /// <summary>
 /// Команда удаления заметки.
 /// </summary>
-public class DeleteNoteCommand : IRequest<Unit>
+public class DeleteNoteCommand : IRequest<Result<Unit>>
 {
     /// <summary>
     /// Идентификатор заметки.

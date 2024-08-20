@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 using TMS.Notes.Core;
-using TMS.Notes.DataAccess.Configurations;
+using TMS.Notes.DataAccess.Dtos;
 
 namespace TMS.Notes.DataAccess;
 
@@ -25,7 +26,7 @@ public class NoteDbContext : DbContext
     /// <summary>
     /// Возвращает или устанавливает набор данных для объекта <see cref="Note"/>.
     /// </summary>
-    public DbSet<Note> Notes { get; set; }
+    public DbSet<NoteDto> Notes { get; set; }
 
     /// <summary>
     /// Инициализирует новый экземпляр класса <see cref="NoteDbContext"/>.
@@ -43,8 +44,7 @@ public class NoteDbContext : DbContext
     /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.ApplyConfiguration(new NoteConfiguration());
-        base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
     /// <inheritdoc/>

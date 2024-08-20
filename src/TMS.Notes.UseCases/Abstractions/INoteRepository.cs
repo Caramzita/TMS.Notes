@@ -12,7 +12,7 @@ public interface INoteRepository
     /// </summary>
     /// <param name="userId"> Идентификатор пользователя. </param>
     /// <returns> Асинхронный список заметок. </returns>
-    IAsyncEnumerable<Note> GetNotes(Guid userId);
+    IAsyncEnumerable<Note> GetNotesAsync(Guid userId, string? searchTerm = null, string? sortBy = null);
 
     /// <summary>
     /// Получить заметку по идентификатору.

@@ -1,20 +1,16 @@
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using System.Reflection;
-using System.Text;
+using TMS.Application.UseCases.DI;
 using TMS.Notes.DataAccess;
 using TMS.Notes.DataAccess.Repositories;
-using TMS.Notes.Service.MiddleWare;
 using TMS.Notes.Service.Services;
 using TMS.Notes.UseCases.Abstractions;
 using TMS.Notes.UseCases.Common;
-using TMS.Notes.UseCases.Common.Behaviors;
 using TMS.Notes.UseCases.Notes.Commands.CreateNote;
+using TMS.Security.Integration;
 
 namespace TMS.Notes.Service;
 
@@ -65,58 +61,11 @@ public class Program
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         var xmlFilePath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
-        services.AddSwaggerGen(opts =>
-        {
-            opts.IncludeXmlComments(xmlFilePath);
-
-            opts.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
-            {
-                Description = @"Enter access token",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-                BearerFormat = "JWT",
-                Scheme = JwtBearerDefaults.AuthenticationScheme
-            });
-
-            opts.AddSecurityRequirement(new OpenApiSecurityRequirement()
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Id = JwtBearerDefaults.AuthenticationScheme,
-                            Type = ReferenceType.SecurityScheme,
-                        },
-                    },
-                    new List<string>()
-                }
-            });
-        });
+        services.AddSwagger(xmlFilePath);
 
         services.AddHttpContextAccessor();
 
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(opts =>
-        {
-            opts.TokenValidationParameters = new TokenValidationParameters
-            {
-                //ValidAudience = builder.Configuration["JwtSecurityToken:Audience"],
-                //ValidIssuer = builder.Configuration["JwtSecurityToken:Issuer"],
-                IssuerSigningKey = new SymmetricSecurityKey
-                    (Encoding.UTF8.GetBytes(builder.Configuration["K17T6p+mYlBuIll6EOQDUmAdM6xmzeHOpE+O35zsAvw="]!)),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateIssuerSigningKey = true,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
-            };
-        });
-
+        services.AddJwtBearerAuthentication(builder.Configuration);
 
         services.AddCors(options =>
         {
@@ -145,8 +94,8 @@ public class Program
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateNoteCommand).Assembly));
 
         services.AddValidatorsFromAssemblyContaining<CreateNoteCommandValidator>();
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
     }
 
     private static async Task RunApp(WebApplicationBuilder builder)
@@ -159,8 +108,6 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
-        app.UseMiddleware<ErrorExceptionHandler>();
 
         app.UseRouting();
         app.UseCors();

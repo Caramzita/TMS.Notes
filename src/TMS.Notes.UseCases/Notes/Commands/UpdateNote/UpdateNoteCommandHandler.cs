@@ -1,41 +1,39 @@
 ﻿using AutoMapper;
 using MediatR;
+using TMS.Application.UseCases;
 using TMS.Notes.Core;
 using TMS.Notes.UseCases.Abstractions;
-using TMS.Notes.UseCases.Exceptions;
 
 namespace TMS.Notes.UseCases.Notes.Commands.UpdateNote;
 
 /// <summary>
 /// Обработчик команды обновления заметки.
 /// </summary>
-public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Note>
+public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, Result<Note>>
 {
-    private readonly INoteRepository _taskRepository;
+    private readonly INoteRepository _noteRepository;
 
     private readonly IMapper _mapper;
 
-    public UpdateNoteCommandHandler(INoteRepository taskRepository, IMapper mapper)
+    public UpdateNoteCommandHandler(INoteRepository noteRepository, IMapper mapper)
     {
-        _taskRepository = taskRepository ?? throw new ArgumentNullException(nameof(taskRepository));
+        _noteRepository = noteRepository ?? throw new ArgumentNullException(nameof(noteRepository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
-    public async Task<Note> Handle(UpdateNoteCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Note>> Handle(UpdateNoteCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _taskRepository.GetNoteById(request.Id);
+        var entity = await _noteRepository.GetNoteById(request.Id);
 
         if (entity == null || entity.UserId != request.Model.UserId)
         {
-            throw new NotFoundException(nameof(Note), request.Id);
+            return Result<Note>.Invalid("note was't found");
         }
 
-        entity.Title = request.Model.Title;
-        entity.Description = request.Model.Description;
-        entity.EditDate = DateTime.UtcNow;    
+        entity.Update(request.Model.Title, request.Model.Description);
 
-        await _taskRepository.Update(entity).ConfigureAwait(false);
+        await _noteRepository.Update(entity).ConfigureAwait(false);
 
-        return entity;
+        return Result<Note>.Success(entity);
     }
 }
