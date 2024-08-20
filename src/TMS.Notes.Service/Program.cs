@@ -1,4 +1,4 @@
-using FluentValidation;
+п»їusing FluentValidation;
 using MediatR;
 using Serilog;
 using Serilog.Events;
@@ -15,7 +15,7 @@ using TMS.Security.Integration;
 namespace TMS.Notes.Service;
 
 /// <summary>
-/// Экземпляр класса <see cref="Program"/>.
+/// Р­РєР·РµРјРїР»СЏСЂ РєР»Р°СЃСЃР° <see cref="Program"/>.
 /// </summary>
 public class Program
 {

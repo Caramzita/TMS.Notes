@@ -1,7 +1,7 @@
 ﻿namespace TMS.Notes.DataAccess.Dtos;
 
 /// <summary>
-/// Класс заметки для обращения в бд.
+/// Модель заметки для обращения в бд.
 /// </summary>
 public class NoteDto
 {
