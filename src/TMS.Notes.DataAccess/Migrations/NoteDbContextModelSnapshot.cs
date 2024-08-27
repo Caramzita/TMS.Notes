@@ -22,7 +22,7 @@ namespace TMS.Notes.DataAccess.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TMS.Notes.Core.Note", b =>
+            modelBuilder.Entity("TMS.Notes.DataAccess.Dtos.NoteDto", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -36,7 +36,7 @@ namespace TMS.Notes.DataAccess.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<DateTime>("EditDate")
+                    b.Property<DateTime?>("EditDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")

@@ -7,7 +7,10 @@ ENV ASPNETCORE_URLS=http://+:8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 
+COPY NuGet.Config ./
+
 WORKDIR /src
+COPY ["src/TMS.Notes.Contracts/TMS.Notes.Contracts.csproj", "TMS.Notes.Contracts/"]
 COPY ["src/TMS.Notes.Core/TMS.Notes.Core.csproj", "TMS.Notes.Core/"]
 COPY ["src/TMS.Notes.Service/TMS.Notes.Service.csproj", "TMS.Notes.Service/"]
 COPY ["src/TMS.Notes.DataAccess/TMS.Notes.DataAccess.csproj", "TMS.Notes.DataAccess/"]
@@ -26,4 +29,7 @@ RUN dotnet publish "TMS.Notes.Service.csproj" -c $BUILD_CONFIGURATION -o /app/pu
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+COPY ["src/TMS.Notes.Service/appsettings.json", "/app/appsettings.json"]
+
 ENTRYPOINT ["dotnet", "TMS.Notes.Service.dll"]

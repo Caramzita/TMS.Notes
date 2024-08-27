@@ -8,6 +8,9 @@ namespace TMS.Notes.UseCases.Notes;
 /// </summary>
 public class NoteModelValidator : AbstractValidator<NoteInputModel>
 {
+    /// <summary>
+    /// Инициализирует новый экземпляр <see cref="NoteModelValidator"/>.
+    /// </summary>
     public NoteModelValidator()
     {
         RuleFor(model => model.Title)

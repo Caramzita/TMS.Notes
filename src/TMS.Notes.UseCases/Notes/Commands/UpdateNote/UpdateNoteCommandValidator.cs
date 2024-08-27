@@ -7,6 +7,9 @@ namespace TMS.Notes.UseCases.Notes.Commands.UpdateNote;
 /// </summary>
 public class UpdateNoteCommandValidator : AbstractValidator<UpdateNoteCommand>
 {
+    /// <summary>
+    /// Инициализирует новый экземпляр <see cref="UpdateNoteCommandValidator"/>.
+    /// </summary>
     public UpdateNoteCommandValidator()
     {
         RuleFor(command => command.Model)

@@ -1,8 +1,12 @@
 ﻿using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using System.Reflection;
+using TMS.Application.Consul;
+using TMS.Application.Security;
 using TMS.Application.UseCases.DI;
 using TMS.Notes.DataAccess;
 using TMS.Notes.DataAccess.Repositories;
@@ -10,7 +14,6 @@ using TMS.Notes.Service.Services;
 using TMS.Notes.UseCases.Abstractions;
 using TMS.Notes.UseCases.Common;
 using TMS.Notes.UseCases.Notes.Commands.CreateNote;
-using TMS.Security.Integration;
 
 namespace TMS.Notes.Service;
 
@@ -49,9 +52,6 @@ public class Program
 
         builder.Logging.ClearProviders();
         builder.Host.UseSerilog();
-        //builder.Configuration
-        //    .SetBasePath(Directory.GetCurrentDirectory())
-        //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
         var services = builder.Services;
 
@@ -60,12 +60,16 @@ public class Program
 
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         var xmlFilePath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
         services.AddSwagger(xmlFilePath);
 
         services.AddHttpContextAccessor();
 
-        services.AddJwtBearerAuthentication(builder.Configuration);
+        services.AddConsul(builder.Configuration);
+
+        services.AddJwtSettingsFromConsul(builder.Configuration["ConsulKey"]!);
+
+        var settings = services.BuildServiceProvider().GetRequiredService<IOptions<JwtTokenSettings>>().Value;
+        services.AddJwtBearerAuthentication(settings);
 
         services.AddCors(options =>
         {
@@ -79,6 +83,8 @@ public class Program
 
         services.AddHealthChecks();
 
+        services.AddConsul(builder.Configuration);
+
         ConfigureDI(services, builder.Configuration);
 
         return builder;
@@ -90,11 +96,12 @@ public class Program
         services.AddScoped<INoteRepository, NoteRepository>();
         services.AddScoped<IUserAccessor, UserAccessor>();
 
-        services.AddAutoMapper(cfg => cfg.AddProfile(typeof(MappingProfile)));
+        services.AddAutoMapper(typeof(MappingProfile).Assembly, typeof(RepositoryMappingProfile).Assembly);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateNoteCommand).Assembly));
+        
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
         services.AddValidatorsFromAssemblyContaining<CreateNoteCommandValidator>();
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
     }
 
@@ -112,6 +119,7 @@ public class Program
         app.UseRouting();
         app.UseCors();
 
+        app.UseMiddleware<ErrorExceptionHandler>();
         app.UseHttpsRedirection();
 
         app.UseAuthentication();

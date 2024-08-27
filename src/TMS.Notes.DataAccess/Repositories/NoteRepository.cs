@@ -17,19 +17,23 @@ public class NoteRepository : INoteRepository
     /// </summary>
     private readonly NoteDbContext _context;
 
+    /// <summary>
+    /// Маппер.
+    /// </summary>
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Инициализирует новый экземпляр класса <see cref="NoteRepository"/>.
+    /// </summary>
+    /// <param name="context"> Контекст базы данных. </param>
+    /// <param name="mapper"> Сервис для маппинга объектов. </param>
     public NoteRepository(NoteDbContext context, IMapper mapper)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
-    /// <summary>
-    /// Получить все заметки пользователя.
-    /// </summary>
-    /// <param name="userId">Идентификатор пользователя.</param>
-    /// <returns>Асинхронный список заметок.</returns>
+    /// <inheritdoc/>
     public async IAsyncEnumerable<Note> GetNotesAsync(Guid userId, string? searchTerm = null, string? sortBy = null)
     {
         var query = _context.Notes.AsNoTracking().Where(note => note.UserId == userId);
@@ -55,11 +59,7 @@ public class NoteRepository : INoteRepository
         }
     }
 
-    /// <summary>
-    /// Получить заметку по идентификатору.
-    /// </summary>
-    /// <param name="id">Идентификатор заметки.</param>
-    /// <returns>Запрашиваемая заметка.</returns>
+    /// <inheritdoc/>
     public async Task<Note?> GetNoteById(Guid id)
     {
         var entity = await _context.Notes.AsNoTracking()
@@ -69,10 +69,7 @@ public class NoteRepository : INoteRepository
         return _mapper.Map<Note>(entity);
     }
 
-    /// <summary>
-    /// Добавить заметку.
-    /// </summary>
-    /// <param name="note">Заметка.</param>
+    /// <inheritdoc/>
     public async Task Add(Note note)
     {
         var entity = _mapper.Map<NoteDto>(note);
@@ -81,10 +78,7 @@ public class NoteRepository : INoteRepository
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Удалить заметку.
-    /// </summary>
-    /// <param name="note">Заметка.</param>
+    /// <inheritdoc/>
     public async Task Delete(Note note)
     {
         var entity = _mapper.Map<NoteDto>(note);
@@ -93,10 +87,7 @@ public class NoteRepository : INoteRepository
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Обновить заметку.
-    /// </summary>
-    /// <param name="note">Заметка.</param>
+    /// <inheritdoc/>
     public async Task Update(Note note)
     {
         var entity = _mapper.Map<NoteDto>(note);

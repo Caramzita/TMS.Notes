@@ -7,6 +7,9 @@ namespace TMS.Notes.UseCases.Notes.Commands.CreateNote;
 /// </summary>
 public class CreateNoteCommandValidator : AbstractValidator<CreateNoteCommand>
 {
+    /// <summary>
+    /// Инициализирует новый экземпляр <see cref="CreateNoteCommandValidator"/>.
+    /// </summary>
     public CreateNoteCommandValidator()
     {
         RuleFor(command => command.Model)

@@ -8,6 +8,9 @@ namespace TMS.Notes.UseCases.Notes.Commands.DeleteNote;
 /// </summary>
 public class DeleteNoteCommandValidator : AbstractValidator<DeleteNoteCommand>
 {
+    /// <summary>
+    /// Инициализирует новый экземпляр <see cref="DeleteNoteCommandValidator"/>.
+    /// </summary>
     public DeleteNoteCommandValidator()
     {
         RuleFor(command => command.Id)

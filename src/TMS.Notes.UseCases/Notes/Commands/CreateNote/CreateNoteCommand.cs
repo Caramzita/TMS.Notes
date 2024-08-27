@@ -13,6 +13,10 @@ public class CreateNoteCommand : IRequest<Result<Guid>>
     /// </summary>
     public NoteInputModel Model { get; }
 
+    /// <summary>
+    /// Инициализирует новый экземпляр <see cref="CreateNoteCommand"/>.
+    /// </summary>
+    /// <param name="model"> Модель заметки. </param>
     public CreateNoteCommand(NoteInputModel model)
     {
         Model = model;

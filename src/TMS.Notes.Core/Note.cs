@@ -18,12 +18,12 @@ public class Note
     /// <summary>
     /// Идентификатор заметки.
     /// </summary>
-    public Guid Id { get; }
+    public Guid Id { get; private set; }
 
     /// <summary>
     /// Идентификатор пользователя.
     /// </summary>
-    public Guid UserId { get; }
+    public Guid UserId { get; private set; }
 
     /// <summary>
     /// Заголовок.
@@ -57,6 +57,26 @@ public class Note
         Title = title;
         Description = description;
         UserId = userId;
+        CreationDate = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Конструктор для инициализации модели уже существующей заметки.
+    /// </summary>
+    /// <param name="id"> Идентификатор. </param>
+    /// <param name="userId"> Идентификатор пользователя. </param>
+    /// <param name="title"> Заголовок. </param>
+    /// <param name="description"> Описание. </param>
+    /// <param name="creationDate"> Дата создания заметки. </param>
+    /// <param name="editDate"> Дата изменения заметки. </param>
+    public Note(Guid id, Guid userId, string title, string description, DateTime creationDate, DateTime? editDate)
+    {
+        Id = id;
+        UserId = userId;
+        Title = title;
+        Description = description;
+        CreationDate = creationDate;
+        EditDate = editDate;
     }
 
     /// <summary>

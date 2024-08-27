@@ -18,6 +18,11 @@ public class DeleteNoteCommand : IRequest<Result<Unit>>
     /// </summary>
     public Guid UserId { get; }
 
+    /// <summary>
+    /// Инициализирует новый экземпляр <see cref="DeleteNoteCommand"/>.
+    /// </summary>
+    /// <param name="id"> Идентификатор заметки. </param>
+    /// <param name="userId"> Идентификатор пользователя. </param>
     public DeleteNoteCommand(Guid id, Guid userId)
     {
         UserId = userId;

@@ -19,6 +19,11 @@ public class UpdateNoteCommand : IRequest<Result<Note>>
     /// </summary>
     public NoteInputModel Model { get; }
 
+    /// <summary>
+    /// Инициализирует новый экземпляр <see cref="DeleteNoteCommand"/>.
+    /// </summary>
+    /// <param name="id"> Идентификатор заметки. </param>
+    /// <param name="model"> Модель заметки. </param>
     public UpdateNoteCommand(Guid id, NoteInputModel model)
     {
         Id = id;

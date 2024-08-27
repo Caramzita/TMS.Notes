@@ -30,10 +30,7 @@ public class UserAccessor : IUserAccessor
             ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     }
 
-    /// <summary>
-    /// Получить идентификатор пользователя.
-    /// </summary>
-    /// <returns> Идентификатор пользователя. </returns>
+    /// <inheritdoc/>
     public Guid GetUserId()
     {
         if (Guid.TryParse(_user.Claims.First
