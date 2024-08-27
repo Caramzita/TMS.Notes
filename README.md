@@ -20,8 +20,8 @@
     "description": "test description"
   }
 - **Response**:
-  - `201 Created if successful`
-  - `400 Bad Request if there are validation errors`
+  - `201 Created` if successful
+  - `400 Bad Request` if there are validation errors
 
 ### Update a Note
 - **Endpoint:** `PUT /api/Note`
@@ -34,17 +34,18 @@
     "description": "test description2"
   }
  - **Response**: 
-   - `200 OK if successful`
-   - `400 Bad Request if there are validation errors`
-   - `404 Not Found if the note does not exist`
+   - `200 OK` if successful
+   - `400 Bad Request` if there are validation errors
+   - `404 Not Found` if the note does not exist
+     
 ### Delete a Note
 - **Endpoint:** `DELETE /api/Note/{id}`
 - **Description:** Deletes a note by its ID.
 - **Request URL Parameter:**
     - `id: The ID of the note to delete`
 - **Response**:
-   - `204 No Content if successful`
-   - `404 Not Found if the note does not exist`
+   - `204 No Content` if successful
+   - `404 Not Found` if the note does not exist
  
 ## Configuration
 ### Example Configuration
